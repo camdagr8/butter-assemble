@@ -1,8 +1,7 @@
-# Fabricator Assemble
+# Butter Assemble
 
-[![Build Status](https://travis-ci.org/fbrctr/fabricator-assemble.svg?branch=master)](https://travis-ci.org/fbrctr/fabricator-assemble) [![npm version](https://badge.fury.io/js/fabricator-assemble.svg)](http://badge.fury.io/js/fabricator-assemble)
 
-> The assembly engine behind Fabricator. Not associated with [Assemble](http://assemble.io).
+> The assembly engine behind Butter. Not associated with [Assemble](http://assemble.io). Inspired by [Fabricator Assemble](https://github.com/fbrctr/butter-assemble).
 
 Turn this:
 
@@ -40,7 +39,7 @@ Into this:
 The task returns a promise, so it can be used in an async task runner, like Gulp:
 
 ```js
-var assemble = require('fabricator-assemble');
+var assemble = require('butter-assemble');
 var gulp = require('gulp');
 
 gulp.task('assemble', function () {
@@ -116,14 +115,14 @@ Files to use as layout includes.
 Type: `String` or `Array`
 Default: `['src/views/**/*', '!src/views/+(layouts)/**']`
 
-Pages to pass through the assembler to be templated. Fabricator pages are stored at the root level `views` and user-defined views can be stored in subdirectories.
+Pages to pass through the assembler to be templated. Butter pages are stored at the root level `views` and user-defined views can be stored in subdirectories.
 
 ### options.materials
 
 Type: `String` or `Array`
 Default: `src/materials/**/*`
 
-Files to use a partials/helpers. These are the materials that make up your toolkit. by default, Fabricator comes with "components" and "structures", but you can define your own taxonomy.
+Files to use a partials/helpers. These are the materials that make up your toolkit. by default, Butter comes with "components" and "structures", but you can define your own taxonomy.
 
 ### options.data
 
@@ -144,7 +143,7 @@ Markdown files containing toolkit-wide documentation
 Type: `Objects`
 Default: `materials/views/docs`
 
-Object keywords for accessing "materials", "views", and "docs" in a view templating context. Fabricator uses some specific terms like "materials" to describe what are really "partials" in Handelbars. This option give you the flexibility to define your own terms for `materials`, `views`, and `docs`.
+Object keywords for accessing "materials", "views", and "docs" in a view templating context. Butter uses some specific terms like "materials" to describe what are really "partials" in Handelbars. This option give you the flexibility to define your own terms for `materials`, `views`, and `docs`.
 
 For example:
 
@@ -257,7 +256,7 @@ When no `layout` property is defined, the page uses the `default` layout.
 
 #### Views
 
-Views are unique pages templated using Handlebars. These are both Fabricator pages and user-created pages (i.e. example templates)
+Views are unique pages templated using Handlebars. These are both Butter pages and user-created pages (i.e. example templates)
 
 View example:
 
@@ -279,7 +278,7 @@ The front matter block at the top provides context to both the layout and the pa
 
 Context is also piped in from data files (see below). In this example, `{{home.greeting}}` refers to the `greeting` property in `home.json`.
 
-Fabricator pages are typically stored at the root level of the `views` directory and user-created views (e.g. "templates", "pages", "interfaces") should be stored in subdirectories.
+Butter pages are typically stored at the root level of the `views` directory and user-created views (e.g. "templates", "pages", "interfaces") should be stored in subdirectories.
 
 #### Materials
 
