@@ -776,9 +776,12 @@ var assemble = function () {
 		var pageMatter = getMatter(file),
 			pageContent = pageMatter.content;
 
+		/*
 		if (collection) {
-			pageMatter.data.baseurl = '..';
+			pageMatter.data.baseurl = '.';
 		}
+		*/
+		if (pageMatter) { pageMatter.data.baseurl = (collection) ? '..' : '.'; }
 
 		// template using Handlebars
 		var source = wrapPage(pageContent, assembly.layouts[pageMatter.data.layout || options.layout]),
