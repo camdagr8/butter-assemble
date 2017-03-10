@@ -1,6 +1,6 @@
 {
   "name": "butter-assemble",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "description": "The assembly engine behind Butter",
   "main": "index.js",
   "engines": {
