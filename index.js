@@ -156,6 +156,7 @@ var assembly = {
 /**
  * Get the name of a file (minus extension) from a path
  * @param  {String} filePath
+ * @param {Boolean} preserveNumbers
  * @example
  * './src/materials/structures/foo.html' -> 'foo'
  * './src/materials/structures/02-bar.html' -> 'bar'
@@ -194,7 +195,7 @@ var handleError = function (e) {
 	var error = _.assign({}, {
 		name: 'Error',
 		reason: '',
-		message: 'An error occurred',
+		message: 'An error occurred'
 	}, e);
 
 	// call onError
@@ -287,6 +288,20 @@ var parseMaterials = function () {
 		return path.normalize(dir).split(path.sep).slice(-2, -1)[0];
 	});
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
+    // get hooks
+    var hooks = options.hooks || {};
+
+
+    /**
+     * Hook -> beforeMaterials
+     * @description Allows for user injection before the materials are parsed.
+     */
+    if (typeof hooks.beforeMaterials === 'function') {
+        files = hooks.beforeMaterials(options, {files: files, materials: assembly.materials}) || files;
+    }
 
 	// stub out an object for each collection and subCollection
 	files.forEach(function (file) {
@@ -312,22 +327,6 @@ var parseMaterials = function () {
 		}
 
 	});
-
-    // Run the exclude function on the file array
-    files = exc(null, {files:files});
-
-	// get hooks
-	var hooks = options.hooks || {};
-
-
-	/**
-	 * Hook -> beforeMaterials
-	 * @description Allows for user injection before the materials are parsed.
-	 */
-	if (typeof hooks.beforeMaterials === 'function') {
-		files = hooks.beforeMaterials(options, {files: files, materials: assembly.materials}) || files;
-	}
-
 
 	// iterate over each file (material)
 	files.forEach(function (file) {
@@ -746,7 +745,7 @@ var registerHelpers = function () {
 
 /**
  * Setup the assembly
- * @param  {Objet} options  User options
+ * @param  {Object} userOptions  User options
  */
 var setup = function (userOptions) {
 
@@ -787,7 +786,7 @@ var assemble = function () {
 	// iterate over each view
 	files.forEach(function (file) {
 
-		var id = getName(file);
+		//var id = getName(file);
 
 		// build filePath
 		var dirname = path.normalize(path.dirname(file)).split(path.sep).pop(),
@@ -798,11 +797,6 @@ var assemble = function () {
 		var pageMatter = getMatter(file),
 			pageContent = pageMatter.content;
 
-		/*
-		if (collection) {
-			pageMatter.data.baseurl = '.';
-		}
-		*/
 		if (pageMatter) { pageMatter.data.baseurl = (collection) ? '..' : '.'; }
 
 		// template using Handlebars
@@ -826,7 +820,7 @@ var assemble = function () {
 		} catch(e) {
 			const originFilePath = path.dirname(file) + '/' + path.basename(file);
 
-			console.error('\x1b[31m \x1b[1mBold', 'Error while comiling template', originFilePath, '\x1b[0m \n')
+			console.error('\x1b[31m \x1b[1mBold', 'Error while comiling template', originFilePath, '\x1b[0m \n');
 			throw e;
 		}
 
