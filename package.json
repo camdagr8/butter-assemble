@@ -1,6 +1,6 @@
 {
   "name": "butter-assemble",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "The assembly engine behind Butter",
   "main": "index.js",
   "engines": {
@@ -14,13 +14,16 @@
     "butter"
   ],
   "author": "Cam Tullos, Luke Askew",
-  "license": "GPL",
+  "license": "GPL-3.0",
   "repository": "camdagr8/butter-assemble",
   "dependencies": {
+    "butter-assemble-exclude": "^1.0.1",
     "chalk": "^1.1.3",
+    "del": "^2.2.1",
     "globby": "^5.0.0",
     "gray-matter": "^2.0.2",
     "handlebars": "^4.0.5",
+    "helper-markdown": "^0.1.2",
     "html-minifier": "^2.1.7",
     "i": "^0.3.5",
     "js-beautify": "^1.6.3",
@@ -31,9 +34,6 @@
     "sort-object": "^3.0.2"
   },
   "devDependencies": {
-    "del": "^2.2.1",
-    "helper-markdown": "^0.1.2",
-    "html-minifier": "^2.1.7",
     "mocha": "^2.5.3"
   }
 }

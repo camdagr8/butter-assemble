@@ -1,18 +1,20 @@
-// modules
-var _ = require('lodash');
-var beautifyHtml = require('js-beautify').html;
-var chalk = require('chalk');
-var fs = require('fs');
-var globby = require('globby');
-var Handlebars = require('handlebars');
-var inflect = require('i')();
-var matter = require('gray-matter');
-var md = require('markdown-it')({ html: true, linkify: true });
-var mkdirp = require('mkdirp');
-var path = require('path');
-var sortObj = require('sort-object');
-var yaml = require('js-yaml');
+'use strict';
 
+// modules
+var _               = require('lodash');
+var beautifyHtml    = require('js-beautify').html;
+var chalk           = require('chalk');
+var fs              = require('fs');
+var globby          = require('globby');
+var Handlebars      = require('handlebars');
+var inflect         = require('i')();
+var matter          = require('gray-matter');
+var md              = require('markdown-it')({ html: true, linkify: true });
+var mkdirp          = require('mkdirp');
+var path            = require('path');
+var sortObj         = require('sort-object');
+var yaml            = require('js-yaml');
+var exc             = require('butter-assemble-exclude');
 
 /**
  * Default options
@@ -219,6 +221,7 @@ var handleError = function (e) {
 /**
  * Build the template context by merging context-specific data with assembly data
  * @param  {Object} data
+ * @param {Object} hash
  * @return {Object}
  */
 var buildContext = function (data, hash) {
@@ -310,8 +313,12 @@ var parseMaterials = function () {
 
 	});
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
 	// get hooks
 	var hooks = options.hooks || {};
+
 
 	/**
 	 * Hook -> beforeMaterials
@@ -415,6 +422,9 @@ var parseDocs = function () {
 	// get files
 	var files = globby.sync(options.docs, { nodir: true });
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
 	// get hooks
 	var hooks = options.hooks || {};
 
@@ -465,6 +475,9 @@ var parseLayouts = function () {
 	// get files
 	var files = globby.sync(options.layouts, { nodir: true });
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
 	// get hooks
 	var hooks = options.hooks || {};
 
@@ -509,6 +522,9 @@ var parseLayoutIncludes = function () {
 
 	// get files
 	var files = globby.sync(options.layoutIncludes, { nodir: true });
+
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
 
 	// get hooks
 	var hooks = options.hooks || {};
@@ -555,6 +571,9 @@ var parseData = function () {
 	// get files
 	var files = globby.sync(options.data, { nodir: true });
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
 	// get hooks
 	var hooks = options.hooks || {};
 
@@ -600,6 +619,9 @@ var parseViews = function () {
 
 	// get files
 	var files = globby.sync(options.views, { nodir: true });
+
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
 
 	// get hooks
 	var hooks = options.hooks || {};
