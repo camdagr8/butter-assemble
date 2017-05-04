@@ -15,6 +15,7 @@ var path            = require('path');
 var sortObj         = require('sort-object');
 var yaml            = require('js-yaml');
 var exc             = require('butter-assemble-exclude');
+var log = console.log.bind(console);
 
 /**
  * Default options
@@ -206,13 +207,13 @@ var handleError = function (e) {
 
 	// log errors
 	if (options.logErrors) {
-		console.error(chalk.bold.red('Error (fabricator-assemble): ' + e.message + '\n'), e.stack);
+		console.error(chalk.bold.red('Error (butter-assemble): ' + e.message + '\n'), e.stack);
 		exit = false;
 	}
 
 	// break the build if desired
 	if (exit) {
-		console.error(chalk.bold.red('Error (fabricator-assemble): ' + e.message + '\n'), e.stack);
+		console.error(chalk.bold.red('Error (butter-assemble): ' + e.message + '\n'), e.stack);
 		process.exit(1);
 	}
 
@@ -294,13 +295,12 @@ var parseMaterials = function () {
     // get hooks
     var hooks = options.hooks || {};
 
-
     /**
      * Hook -> beforeMaterials
      * @description Allows for user injection before the materials are parsed.
      */
     if (typeof hooks.beforeMaterials === 'function') {
-        files = hooks.beforeMaterials(options, {files: files, materials: assembly.materials}) || files;
+        files = hooks.beforeMaterials(options, {files: files}) || files;
     }
 
 	// stub out an object for each collection and subCollection
@@ -345,8 +345,6 @@ var parseMaterials = function () {
 		// trim whitespace from material content
 		var content = fileMatter.content.replace(/^(\s*(\r?\n|\r))+|(\s*(\r?\n|\r))+$/g, '');
 
-
-
 		// capture meta data for the material
 		if (!isSubCollection) {
 			assembly.materials[collection].items[key] = {
@@ -386,11 +384,11 @@ var parseMaterials = function () {
 		 */
 		if (typeof hooks.materials === 'function') {
 			content = hooks.materials(options, {
-				materialData: assembly.materialData,
-				materials: assembly.materials,
-				content: content,
-				files: files,
-				id: id
+				materialData    : assembly.materialData,
+				materials       : assembly.materials,
+				content         : content,
+				files           : files,
+				id              : id
 			}) || content;
 		}
 
@@ -609,9 +607,9 @@ var parseData = function () {
 
 
 /**
- * Get meta data for views
+ * Get meta data for templates
  */
-var parseViews = function () {
+var parseTemplates = function () {
 
 	// reset
 	assembly.views = {};
@@ -629,8 +627,8 @@ var parseViews = function () {
 	 * Hook -> beforeViews
 	 * @description Allows for user injection before the views are parsed.
 	 */
-	if (typeof hooks.beforeViews === 'function') {
-		files = hooks.beforeViews(options, {files: files, views: assembly.views}) || files;
+	if (typeof hooks.beforeTemplates === 'function') {
+		files = hooks.beforeTemplates(options, {files: files}) || files;
 	}
 
 	files.forEach(function (file) {
@@ -648,8 +646,8 @@ var parseViews = function () {
 		 * Hook -> views
 		 * @description Allows user injection after the view is read.
 		 */
-		if (typeof hooks.views === 'function') {
-			fileData = hooks.views(options, {
+		if (typeof hooks.templates === 'function') {
+			fileData = hooks.templates(options, {
 				views: assembly.views,
 				fileData: fileData,
 				files: files,
@@ -663,6 +661,7 @@ var parseViews = function () {
 			// create collection if it doesn't exist
 			assembly.views[collection] = assembly.views[collection] || {
 				name: toTitleCase(collection),
+				file: file,
 				items: {}
 			};
 
@@ -675,7 +674,6 @@ var parseViews = function () {
 		}
 
 	});
-
 };
 
 
@@ -758,7 +756,7 @@ var setup = function (userOptions) {
 	parseLayoutIncludes();
 	parseData();
 	parseMaterials();
-	parseViews();
+	parseTemplates();
 	parseDocs();
 
 	/**
@@ -780,10 +778,24 @@ var assemble = function () {
 	// get files
 	var files = globby.sync(options.views, { nodir: true });
 
+    // Run the exclude function on the file array
+    files = exc(null, {files:files});
+
+    // get hooks
+    var hooks = options.hooks || {};
+
+    /**
+     * Hook -> beforeViews
+     * @description Allows for user injection before the views are parsed.
+     */
+    if (typeof hooks.beforeViews === 'function') {
+        files = hooks.beforeViews(options, {files: files}) || files;
+    }
+
 	// create output directory if it doesn't already exist
 	mkdirp.sync(options.dest);
 
-	// iterate over each view
+	// iterate over each view;
 	files.forEach(function (file) {
 
 		//var id = getName(file);
