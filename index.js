@@ -17,7 +17,7 @@ const sortObj         = require('sort-object');
 const yaml            = require('js-yaml');
 const exc             = require('butter-assemble-exclude');
 const log             = console.log.bind(console);
-
+const base            = process.env.BASE || '/';
 
 
 /**
@@ -818,7 +818,10 @@ const assemble = function () {
 		let pageMatter = getMatter(file),
 			pageContent = pageMatter.content;
 
-		if (pageMatter) { pageMatter.data.baseurl = (collection) ? '..' : '.'; }
+		//if (pageMatter) { pageMatter.data.baseurl = (collection) ? '..' : '.'; }
+        if (pageMatter) {
+            pageMatter.data.baseurl = base;
+        }
 
 		// template using Handlebars
 		let source = wrapPage(pageContent, assembly.layouts[pageMatter.data.layout || options.layout]),
