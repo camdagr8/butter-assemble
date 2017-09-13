@@ -17,6 +17,8 @@ const sortObj         = require('sort-object');
 const yaml            = require('js-yaml');
 const exc             = require('butter-assemble-exclude');
 const log             = console.log.bind(console);
+const crypto          = require('crypto');
+
 
 
 
@@ -178,7 +180,6 @@ const getName = function (filePath, preserveNumbers) {
     // get name; replace spaces with dashes
     let name = path.basename(filePath, path.extname(filePath)).replace(/\s/g, '-');
     return (preserveNumbers) ? name : name.replace(/^[0-9|\.\-]+/, '');
-
 };
 
 
@@ -265,6 +266,10 @@ const toTitleCase = function(str) {
     });
 };
 
+const getSerial = function (id) {
+    return crypto.createHmac('sha256', 'serial').update(id).digest('hex');
+};
+
 
 /**
  * Insert the page into a layout
@@ -340,12 +345,13 @@ const parseMaterials = function () {
     files.forEach(function (file) {
 
         // get info
-        let fileMatter = getMatter(file);
-        let collection = getName(path.normalize(path.dirname(file)).split(path.sep).pop(), true);
-        let parent = path.normalize(path.dirname(file)).split(path.sep).slice(-2, -1)[0];
-        let isSubCollection = (dirs.indexOf(parent) > -1);
-        let id = (isSubCollection) ? getName(collection) + '.' + getName(file) : getName(file);
-        let key = (isSubCollection) ? collection + '.' + getName(file, true) : getName(file, true);
+        let fileMatter         = getMatter(file);
+        let collection         = getName(path.normalize(path.dirname(file)).split(path.sep).pop(), true);
+        let parent             = path.normalize(path.dirname(file)).split(path.sep).slice(-2, -1)[0];
+        let isSubCollection    = (dirs.indexOf(parent) > -1);
+        let id                 = (isSubCollection) ? getName(collection) + '.' + getName(file) : getName(file);
+        let key                = (isSubCollection) ? collection + '.' + getName(file, true) : getName(file, true);
+        let serial             = getSerial(id);
 
         // get material front-matter, omit `notes`
         let localData    = dna(file, files, _.omit(fileMatter.data, 'notes'));
@@ -357,12 +363,14 @@ const parseMaterials = function () {
         if (!isSubCollection) {
             assembly.materials[collection].items[key] = {
                 name: toTitleCase(id),
+                serial: serial,
                 notes: (fileMatter.data.notes) ? md.render(fileMatter.data.notes) : '',
                 data: localData
             };
         } else {
             assembly.materials[parent].items[collection].items[key] = {
                 name: toTitleCase(id.split('.')[1]),
+                serial: serial,
                 notes: (fileMatter.data.notes) ? md.render(fileMatter.data.notes) : '',
                 data: localData
             };
