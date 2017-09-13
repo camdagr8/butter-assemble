@@ -267,7 +267,7 @@ const toTitleCase = function(str) {
 };
 
 const getSerial = function (id) {
-    return crypto.createHmac('sha256', 'serial').update(id).digest('hex');
+    return 'btr-' + crypto.createHmac('sha256', 'serial').update(id).digest('hex');
 };
 
 
