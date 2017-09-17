@@ -318,7 +318,6 @@ const parseMaterials = function () {
 
     // stub out an object for each collection and subCollection
     files.forEach(function (file) {
-
         let parent = getName(path.normalize(path.dirname(file)).split(path.sep).slice(-2, -1)[0], true);
         let collection = getName(path.normalize(path.dirname(file)).split(path.sep).pop(), true);
         let isSubCollection = (dirs.indexOf(parent) > -1);
@@ -329,13 +328,15 @@ const parseMaterials = function () {
         // stub the base object
         assembly.materials[materialBase] = assembly.materials[materialBase] || {
                 name: toTitleCase(getName(materialBase)),
-                items: {}
+                items: {},
+                data: getMatter(file)
             };
 
         if (isSubCollection) {
             assembly.materials[parent].items[collection] = assembly.materials[parent].items[collection] || {
                     name: toTitleCase(getName(collection)),
-                    items: {}
+                    items: {},
+                    data: getMatter(file)
                 };
         }
 
@@ -644,6 +645,14 @@ const parseTemplates = function () {
         let fileMatter = getMatter(file),
             fileData = _.omit(fileMatter.data, 'notes');
 
+        if (assembly.materials.hasOwnProperty(id)) {
+            if (assembly.materials[id].hasOwnProperty('data') && typeof fileMatter === 'object') {
+                assembly.materials[id]['data'] = fileMatter.data;
+            }
+
+            assembly.materials[id]['serial'] = getSerial(id);
+        }
+
         /**
          * Hook -> views
          * @description Allows user injection after the view is read.
@@ -659,7 +668,6 @@ const parseTemplates = function () {
 
         // if this file is part of a collection
         if (collection) {
-
             // create collection if it doesn't exist
             assembly.views[collection] = assembly.views[collection] || {
                     name: toTitleCase(collection),
@@ -672,9 +680,7 @@ const parseTemplates = function () {
                 name: toTitleCase(id),
                 data: fileData
             };
-
         }
-
     });
 };
 
@@ -762,6 +768,7 @@ const setup = function (userOptions) {
     parseMaterials();
     parseTemplates();
     parseDocs();
+
 
     /**
      * Hook -> assembly
