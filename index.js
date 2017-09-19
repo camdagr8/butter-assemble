@@ -91,8 +91,8 @@ const defaults = {
      */
     beautifier: {
         indent_size: 1,
-        indent_char: '	',
-        indent_with_tabs: true
+        indent_char: ' ',
+        indent_with_tabs: false
     },
 
     /**
